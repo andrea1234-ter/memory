@@ -1,46 +1,75 @@
-// --- CARTE DEL MEMORY ---
-let symbols = ["🍎", "🍎", "⭐", "⭐", "🍀", "🍀", "🔥", "🔥"];
 
-// Mischia le carte
-symbols.sort(() => 0.5 - Math.random());
+let simboli = [
+    ["🍎", "🍎", "⭐", "⭐"],
+    ["🍀", "🍀", "🔥", "🔥"]
+];
 
-// Contenitore del gioco
+
+let scoperta = [
+    [false, false, false, false],
+    [false, false, false, false]
+];
+
+
 let game = document.getElementById("game");
 
-// Variabili di controllo
-let firstCard = null;
-let secondCard = null;
-let block = false;
 
-// Crea le carte
-symbols.forEach(symbol => {
-    let card = document.createElement("div");
-    card.className = "card hidden";
-    card.textContent = symbol;
+let r1 = -1, c1 = -1;
+let r2 = -1, c2 = -1;
+let blocco = false;
 
-    card.addEventListener("click", () => {
-        if (block || !card.classList.contains("hidden")) return;
 
-        card.classList.remove("hidden");
+for (let r = 0; r < 2; r++) {
+    for (let c = 0; c < 4; c++) {
+        game.innerHTML +=
+            "<div class='card' id='c" + r + c + "'>?</div>";
+    }
+}
 
-        if (!firstCard) {
-            firstCard = card;
-        } else {
-            secondCard = card;
-            block = true;
 
-            // Controlla se coincidono
-            setTimeout(() => {
-                if (firstCard.textContent !== secondCard.textContent) {
-                    firstCard.classList.add("hidden");
-                    secondCard.classList.add("hidden");
-                }
-                firstCard = null;
-                secondCard = null;
-                block = false;
-            }, 800);
-        }
-    });
+for (let r = 0; r < 2; r++) {
+    for (let c = 0; c < 4; c++) {
 
-    game.appendChild(card);
-});
+        let carta = document.getElementById("c" + r + c);
+
+        carta.onclick = function () {
+
+            if (blocco || scoperta[r][c] == true) {
+                return;
+            }
+
+           
+            carta.innerHTML = simboli[r][c];
+            scoperta[r][c] = true;
+
+          
+            if (r1 == -1) {
+                r1 = r;
+                c1 = c;
+            }
+         
+            else {
+                r2 = r;
+                c2 = c;
+                blocco = true;
+
+                setTimeout(function () {
+
+                  
+                    if (simboli[r1][c1] != simboli[r2][c2]) {
+                        document.getElementById("c" + r1 + c1).innerHTML = "?";
+                        document.getElementById("c" + r2 + c2).innerHTML = "?";
+                        scoperta[r1][c1] = false;
+                        scoperta[r2][c2] = false;
+                    }
+
+                
+                    r1 = -1; c1 = -1;
+                    r2 = -1; c2 = -1;
+                    blocco = false;
+
+                }, 800);
+            }
+        };
+    }
+}
